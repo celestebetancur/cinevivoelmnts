@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/cinevivoelmnts/static/css/main.058ee9ff.chunk.css",
-    "main.js": "/cinevivoelmnts/static/js/main.f05224ca.chunk.js",
-    "main.js.map": "/cinevivoelmnts/static/js/main.f05224ca.chunk.js.map",
+    "main.css": "/cinevivoelmnts/static/css/main.a2cb516a.chunk.css",
+    "main.js": "/cinevivoelmnts/static/js/main.e83a7cb3.chunk.js",
+    "main.js.map": "/cinevivoelmnts/static/js/main.e83a7cb3.chunk.js.map",
     "runtime-main.js": "/cinevivoelmnts/static/js/runtime-main.76de1f59.js",
     "runtime-main.js.map": "/cinevivoelmnts/static/js/runtime-main.76de1f59.js.map",
-    "static/js/2.bdeb7e55.chunk.js": "/cinevivoelmnts/static/js/2.bdeb7e55.chunk.js",
-    "static/js/2.bdeb7e55.chunk.js.map": "/cinevivoelmnts/static/js/2.bdeb7e55.chunk.js.map",
+    "static/js/2.0e603639.chunk.js": "/cinevivoelmnts/static/js/2.0e603639.chunk.js",
+    "static/js/2.0e603639.chunk.js.map": "/cinevivoelmnts/static/js/2.0e603639.chunk.js.map",
     "index.html": "/cinevivoelmnts/index.html",
-    "static/css/main.058ee9ff.chunk.css.map": "/cinevivoelmnts/static/css/main.058ee9ff.chunk.css.map",
-    "static/js/2.bdeb7e55.chunk.js.LICENSE.txt": "/cinevivoelmnts/static/js/2.bdeb7e55.chunk.js.LICENSE.txt"
+    "static/css/main.a2cb516a.chunk.css.map": "/cinevivoelmnts/static/css/main.a2cb516a.chunk.css.map",
+    "static/js/2.0e603639.chunk.js.LICENSE.txt": "/cinevivoelmnts/static/js/2.0e603639.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.76de1f59.js",
-    "static/js/2.bdeb7e55.chunk.js",
-    "static/css/main.058ee9ff.chunk.css",
-    "static/js/main.f05224ca.chunk.js"
+    "static/js/2.0e603639.chunk.js",
+    "static/css/main.a2cb516a.chunk.css",
+    "static/js/main.e83a7cb3.chunk.js"
   ]
 }
