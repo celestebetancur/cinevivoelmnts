@@ -78,7 +78,7 @@ const App = () => {
                 videos[objMain[i].pos] = s.createVideo(e.config.url,()=>{
                   loadedV[objMain[i].pos] = true
                   videos[objMain[i].pos].hide()
-                  videos[objMain[i].pos].volume(1)
+                  videos[objMain[i].pos].volume(typeof objMain[i].volume !== 'undefined' ? objMain[i].volume : 1)
                   videos[objMain[i].pos].loop()
                 })
               })
@@ -327,6 +327,9 @@ const App = () => {
           }
           if(line[1] === 'rate'){
             toReturn[t].rate = Math.abs(line[2]) < 4.0 ? Math.abs(line[2]) : 1.0
+          }
+          if(line[1] === 'volume'){
+            toReturn[t].volume = line[2]
           }
         }
         if(line.length === 5){
