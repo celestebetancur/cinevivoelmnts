@@ -9,8 +9,8 @@ let videos = []
 let ref
 let mainObj = []
 
-const html = require('nanohtml')
-let canvasIn = false
+// const html = require('nanohtml')
+let canvasIn = true
 let hydra
 
 const App = () => {
@@ -33,18 +33,34 @@ const App = () => {
   const [file7,setFile7] = useState('')
   const [file8,setFile8] = useState('')
   const [file9,setFile9] = useState('')
+  const [mouseX, setMouseX] = useState(0)
+  const [mouseY, setMouseY] = useState(0)
+  const [menuCustom, setMenuCustom] = useState(false)
+
+  const [zeroCustom, setZeroCustom] = useState('0')
+  const [oneCustom, setOneCustom] = useState('1')
+  const [twoCustom, setTwoCustom] = useState('2')
+  const [threeCustom, setThreeCustom] = useState('3')
+  const [fourCustom, setFourCustom] = useState('4')
+  const [fiveCustom, setFiveCustom] = useState('5')
+  const [sixCustom, setSixCustom] = useState('6')
+  const [sevenCustom, setSevenCustom] = useState('7')
+  const [eightCustom, setEightCustom] = useState('8')
+  const [nineCustom, setNineCustom] = useState('9')
 
   useEffect(()=>{
     if(canvasIn){
-      const canvasHydra = html`<canvas style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index:5000; overflow: hidden"></canvas>`
-      canvasHydra.width = window.innerWidth
-      canvasHydra.height = window.innerHeight
-      document.body.appendChild(canvasHydra)
+      // const canvasHydra = html`<canvas id="hydraCanvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index:5000; overflow: hidden"></canvas>`
+      // canvasHydra.width = window.innerWidth
+      // canvasHydra.height = window.innerHeight
+      // document.body.appendChild(canvasHydra)
       hydra = new Hydra({
-       detectAudio: false, canvas: canvasHydra
+       detectAudio: false,
+       canvas: document.getElementById('hydraCanvas'),
+       numSources: 5,
+       autoLoop: true
       })
       canvasIn = false
-      hydra.eval('hush()')
     }
   },[])
 
@@ -88,16 +104,16 @@ const App = () => {
           cnv.style('position','fixed')
           // cnv.style('top','-100vh')
           cnv.id('p5canvas')
-          setp5Canvas(cnv.canvas)
-          // hydra.s[3].init({src: p5canvas})
-          // hydra.eval('src(s3).out()')
+          hydra.s[4].init({src: cnv.canvas})
         }
         s.draw = () => {
+
           s.strokeWeight(0)
           s.background(0,0,0,0)
           for(let i = 0; i < 10; i++){
             if(loadedV[i]){
               let sc = typeof objMain[i].scale !== 'undefined' ? objMain[i].scale : 1
+              videos[objMain[i].pos].elt.playbackRate = typeof objMain[i].rate !== 'undefined' ? objMain[i].rate : 1.0
               s.tint(
                 typeof objMain[i].r !== 'undefined' ? objMain[i].r : 255,
                 typeof objMain[i].g !== 'undefined' ? objMain[i].g : 255,
@@ -143,37 +159,37 @@ const App = () => {
                 s.rect(
                   typeof objMain[i].posX !== 'undefined' ? objMain[i].posX : 0,
                   typeof objMain[i].posY !== 'undefined' ? objMain[i].posY : 0,
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width * sc : window.innerWidth,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height * sc : window.innerHeight,
+                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc,
                 )
               }
               if(objMain[i].shape === 'box'){
                 s.box(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight
+                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight *sc
                 )
               }
               if(objMain[i].shape === 'sphere'){
                 s.sphere(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth
+                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc
                 )
               }
               if(objMain[i].shape === 'cylinder'){
                 s.cylinder(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight
+                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight *sc
                 )
               }
               if(objMain[i].shape === 'cone'){
                 s.cone(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight
+                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc
                 )
               }
               if(objMain[i].shape === 'torus'){
                 s.torus(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight
+                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc
                 )
               }
               s.pop()
@@ -214,7 +230,7 @@ const App = () => {
           }
         }
         if(line.length === 3){
-          var t = line[0]
+          var t = checkCustom(line[0])
           if(line[1] === 'load'){
             if(line[2] !== 'file0' && line[2] !== 'file1' && line[2] !== 'file2' && line[2] !== 'file3' && line[2] !== 'file4' && line[2] !== 'file5' && line[2] !== 'file6' && line[2] !== 'file7' && line[2] !== 'file8' && line[2] !== 'file9' && line[2] !== 'camera'){
               toReturn[t].url = line[2]
@@ -277,7 +293,7 @@ const App = () => {
             }
           }
           if(line[1] === 'posX'){
-            toReturn[t].posX = line[2]
+            toReturn[t].posX = parseFloat(line[2])
           }
           if(line[1] === 'posY'){
             toReturn[t].posY = line[2]
@@ -309,6 +325,9 @@ const App = () => {
           if(line[1] === 'shape'){
             toReturn[t].shape = line[2]
           }
+          if(line[1] === 'rate'){
+            toReturn[t].rate = Math.abs(line[2]) < 4.0 ? Math.abs(line[2]) : 1.0
+          }
         }
         if(line.length === 5){
           if(line[1] === 'color'){
@@ -328,7 +347,7 @@ const App = () => {
     for (let i = 0; i < temp.length; i++){
       if(temp[i].includes('hydra')){
         try {
-          hydra.eval(temp[i+1].replace('CineVivo','s3'))
+          hydra.eval(temp[i+1].replace('CineVivo','s4'))
         } catch (err) {
           setDisplayError(err)
         }
@@ -361,12 +380,138 @@ const App = () => {
     }
   }
 
+  const checkCustom = (toCheck) => {
+    if(toCheck === zeroCustom){
+      return 0
+    }
+    if(toCheck === oneCustom){
+      return 1
+    }
+    if(toCheck === twoCustom){
+      return 2
+    }
+    if(toCheck === threeCustom){
+      return 3
+    }
+    if(toCheck === fourCustom){
+      return 4
+    }
+    if(toCheck === fiveCustom){
+      return 5
+    }
+    if(toCheck === sixCustom){
+      return 6
+    }
+    if(toCheck === sevenCustom){
+      return 7
+    }
+    if(toCheck === eightCustom){
+      return 8
+    }
+    if(toCheck === nineCustom){
+      return 9
+    }
+  }
+
   return (
     <>
+    <canvas id="hydraCanvas" style={{position: "absolute", top: "0", left: "0", width: "100%", height: "100%", zIndex:"5000", overflow: "hidden"}}></canvas>
     <button
       className="buttonMenu"
       onClick={() => setMenu(!menu)}
       >?</button>
+    <button
+      className="buttonCustom"
+      onClick={() => setMenuCustom(!menuCustom)}
+      >custom</button>
+    {menuCustom &&
+      <>
+      <div
+        className="menu"
+        >
+        <div style={{display:'block'}}>
+          <label htmlFor="0">0
+            <input
+              onChange={e => setZeroCustom(e.target.value)}
+              id="0"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="1">1
+            <input
+              onChange={e => setOneCustom(e.target.value)}
+              id="1"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="2">2
+            <input
+              onChange={e => setTwoCustom(e.target.value)}
+              id="2"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="3">3
+            <input
+              onChange={e => setThreeCustom(e.target.value)}
+              id="3"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="4">4
+            <input
+              onChange={e => setFourCustom(e.target.value)}
+              id="4"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="5">5
+            <input
+              onChange={e => setFiveCustom(e.target.value)}
+              id="5"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="6">6
+            <input
+              onChange={e => setSixCustom(e.target.value)}
+              id="6"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="7">7
+            <input
+              onChange={e => setSevenCustom(e.target.value)}
+              id="7"
+              className="inputCustom"></input>
+          </label>
+        </div>
+        <div style={{display:'block'}}>
+          <label htmlFor="8">8
+            <input
+              onChange={e => setEightCustom(e.target.value)}
+              id="8"
+              className="inputCustom"></input>
+          </label>
+        </div>
+          <div style={{display:'block'}}>
+          <label htmlFor="9">9
+            <input
+              onChange={e => setNineCustom(e.target.value)}
+              id="9"
+              className="inputCustom"></input>
+          </label>
+        </div>
+      </div>
+      </>
+    }
     {menu &&
       <div
         className="menu"
@@ -424,11 +569,12 @@ const App = () => {
       </div>
     }
     <textarea
-        onKeyDown={e => eventHandler(e)}
-        className="area"
-        onChange={e => {setCode(e.target.value); setDisplayError('')}}
-        style={{fontSize:`${fontS}rem`, color:`${fontC}`, opacity:`${hideCode ? 0 : 1}`}}
-      />
+      onMouseMove={e => {setMouseX(e.clientX);setMouseY(e.clientY)}}
+      onKeyDown={e => eventHandler(e)}
+      className="area"
+      onChange={e => {setCode(e.target.value); setDisplayError('')}}
+      style={{fontSize:`${fontS}rem`, color:`${fontC}`, opacity:`${hideCode ? 0 : 1}`}}
+    />
     <p
       style={{position:'fixed',zIndex:'4000',bottom:'10px',left:'10px',backgroundColor:'rgba(100,100,100,0.4)'}}
       >{`${displayError}`}</p>

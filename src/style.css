@@ -53,6 +53,17 @@ body{
   cursor: pointer;
 }
 
+.buttonCustom{
+  position: fixed;
+  z-index: 20000;
+  top:1rem;
+  right: 3rem;
+  background-color: rgb(200,200,200,0.5);
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
 .menu {
   position: fixed;
   z-index: 10000;
@@ -69,4 +80,10 @@ body{
   z-index: 10000;
   cursor: pointer;
   margin-left: 0.5rem;
+}
+
+.inputCustom{
+  position: absolute;
+  right: 0.2rem;
+  width:10rem;
 }
