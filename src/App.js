@@ -97,6 +97,7 @@ const App = () => {
           s.background(0,0,0,0)
           for(let i = 0; i < 10; i++){
             if(loadedV[i]){
+              let sc = typeof objMain[i].scale !== 'undefined' ? objMain[i].scale : 1
               s.tint(
                 typeof objMain[i].r !== 'undefined' ? objMain[i].r : 255,
                 typeof objMain[i].g !== 'undefined' ? objMain[i].g : 255,
@@ -142,8 +143,8 @@ const App = () => {
                 s.rect(
                   typeof objMain[i].posX !== 'undefined' ? objMain[i].posX : 0,
                   typeof objMain[i].posY !== 'undefined' ? objMain[i].posY : 0,
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight,
+                  typeof objMain[i].width !== 'undefined' ? objMain[i].width * sc : window.innerWidth,
+                  typeof objMain[i].height !== 'undefined' ? objMain[i].height * sc : window.innerHeight,
                 )
               }
               if(objMain[i].shape === 'box'){
@@ -289,6 +290,9 @@ const App = () => {
           }
           if(line[1] === 'height'){
             toReturn[t].height = parseFloat(line[2])
+          }
+          if(line[1] === 'scale'){
+            toReturn[t].scale = parseFloat(line[2])
           }
           if(line[1] === 'rotX'){
             toReturn[t].rotX = parseFloat(line[2])
