@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import Hydra from 'hydra-synth'
 import p5 from 'p5'
 import axios from 'axios'
+import {Howl, Howler} from 'howler'
 
 import './style.css'
 
@@ -73,22 +74,31 @@ const App = () => {
         s.setup = () => {
           loadedV = [false,false,false,false,false,false,false,false,false,false]
           for(let i = 0; i < 10; i++){
-            if(objMain[i].active && objMain[i].type === 'video'){
+            if(objMain[i].active &&  objMain[i].type !== 'camera'){
               axios.get(objMain[i].url).then((e)=> {
-                videos[objMain[i].pos] = s.createVideo(e.config.url,()=>{
+                if(e.headers['content-type'] === 'video/mp4' || e.headers['content-type'] === 'video/webm' || e.headers['content-type'] === 'video/ogg'){
+                  videos[objMain[i].pos] = s.createVideo(e.config.url,()=>{
+                    loadedV[objMain[i].pos] = true
+                    videos[objMain[i].pos].hide()
+                    videos[objMain[i].pos].volume(typeof objMain[i].volume !== 'undefined' ? objMain[i].volume : 1)
+                    videos[objMain[i].pos].loop()
+                  })
+                }
+                if(e.headers['content-type'] === 'image/jpeg' || e.headers['content-type'] === 'image/jpg' || e.headers['content-type'] === 'image/jfif' || e.headers['content-type'] === 'image/pjpeg' || e.headers['content-type'] === 'image/png'){
+                  videos[objMain[i].pos] = s.createImg(e.config.url,'','',()=>{
+                    loadedV[objMain[i].pos] = true
+                    videos[objMain[i].pos].hide()
+                  })
+                }
+                if(e.headers['content-type'] === 'audio/wav' || e.headers['content-type'] === 'audio/mp3' || e.headers['content-type'] === 'audio/ogg'){
                   loadedV[objMain[i].pos] = true
-                  videos[objMain[i].pos].hide()
-                  videos[objMain[i].pos].volume(typeof objMain[i].volume !== 'undefined' ? objMain[i].volume : 1)
+                  videos[objMain[i].pos] = s.createAudio()
+                  videos[objMain[i].pos].src = e.config.url
+                  objMain[i].type = 'audio'
+                  videos[objMain[i].pos].autoplay = true
+                  videos[objMain[i].pos].play()
                   videos[objMain[i].pos].loop()
-                })
-              })
-            }
-            if(objMain[i].active && objMain[i].type === 'image'){
-              axios.get(objMain[i].url).then((e)=> {
-                videos[objMain[i].pos] = s.createImg(e.config.url,'','',()=>{
-                  loadedV[objMain[i].pos] = true
-                  videos[objMain[i].pos].hide()
-                })
+                }
               })
             }
             if(objMain[i].active && objMain[i].type === 'camera'){
@@ -112,87 +122,89 @@ const App = () => {
           s.background(0,0,0,0)
           for(let i = 0; i < 10; i++){
             if(loadedV[i]){
-              let sc = typeof objMain[i].scale !== 'undefined' ? objMain[i].scale : 1
-              videos[objMain[i].pos].elt.playbackRate = typeof objMain[i].rate !== 'undefined' ? objMain[i].rate : 1.0
-              s.tint(
-                typeof objMain[i].r !== 'undefined' ? objMain[i].r : 255,
-                typeof objMain[i].g !== 'undefined' ? objMain[i].g : 255,
-                typeof objMain[i].b !== 'undefined' ? objMain[i].b : 255,
-                typeof objMain[i].opacity !== 'undefined' ? objMain[i].opacity : 255
-              )
-              s.push()
-              if(objMain[i].shape === 'rect'){
-                s.translate(-s.width/2,-s.height/2)
-              }
-              if(typeof objMain[i].rotSpeedX !== 'undefined'){
-                s.rotateX(
-                  typeof objMain[i].rotX !== 'undefined' ? objMain[i].rotX * s.frameCount * objMain[i].rotSpeedX: 0
+              if(objMain[i].type !== 'audio'){
+                let sc = typeof objMain[i].scale !== 'undefined' ? objMain[i].scale : 1
+                videos[objMain[i].pos].elt.playbackRate = typeof objMain[i].rate !== 'undefined' ? objMain[i].rate : 1.0
+                s.tint(
+                  typeof objMain[i].r !== 'undefined' ? objMain[i].r : 255,
+                  typeof objMain[i].g !== 'undefined' ? objMain[i].g : 255,
+                  typeof objMain[i].b !== 'undefined' ? objMain[i].b : 255,
+                  typeof objMain[i].opacity !== 'undefined' ? objMain[i].opacity : 255
                 )
+                s.push()
+                if(objMain[i].shape === 'rect'){
+                  s.translate(-s.width/2,-s.height/2)
+                }
+                if(typeof objMain[i].rotSpeedX !== 'undefined'){
+                  s.rotateX(
+                    typeof objMain[i].rotX !== 'undefined' ? objMain[i].rotX * s.frameCount * objMain[i].rotSpeedX: 0
+                  )
+                }
+                if(typeof objMain[i].rotSpeedX === 'undefined'){
+                  s.rotateX(
+                    typeof objMain[i].rotX !== 'undefined' ? objMain[i].rotX * s.frameCount * 0.1: 0
+                  )
+                }
+                if(typeof objMain[i].rotSpeedY === 'undefined'){
+                  s.rotateY(
+                    typeof objMain[i].rotY !== 'undefined' ? objMain[i].rotY * s.frameCount * 0.1: 0
+                  )
+                }
+                if(typeof objMain[i].rotSpeedY !== 'undefined'){
+                  s.rotateY(
+                    typeof objMain[i].rotY !== 'undefined' ? objMain[i].rotY * s.frameCount * objMain[i].rotSpeedY: 0
+                  )
+                }
+                s.texture(videos[objMain[i].pos])
+                // s.quad(
+                //   typeof objMain[i].posX !== 'undefined' ? objMain[i].posX : 0,
+                //   typeof objMain[i].posY !== 'undefined' ? objMain[i].posY : 0,
+                //   typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
+                //   0,
+                //   typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
+                //   typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight,
+                //   0,
+                //   typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight,
+                // )
+                if(objMain[i].shape === 'rect'){
+                  s.rect(
+                    typeof objMain[i].posX !== 'undefined' ? objMain[i].posX : 0,
+                    typeof objMain[i].posY !== 'undefined' ? objMain[i].posY : 0,
+                    typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                    typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc,
+                  )
+                }
+                if(objMain[i].shape === 'box'){
+                  s.box(
+                    typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                    typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight *sc
+                  )
+                }
+                if(objMain[i].shape === 'sphere'){
+                  s.sphere(
+                    typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc
+                  )
+                }
+                if(objMain[i].shape === 'cylinder'){
+                  s.cylinder(
+                    typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                    typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight *sc
+                  )
+                }
+                if(objMain[i].shape === 'cone'){
+                  s.cone(
+                    typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                    typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc
+                  )
+                }
+                if(objMain[i].shape === 'torus'){
+                  s.torus(
+                    typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
+                    typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc
+                  )
+                }
+                s.pop()
               }
-              if(typeof objMain[i].rotSpeedX === 'undefined'){
-                s.rotateX(
-                  typeof objMain[i].rotX !== 'undefined' ? objMain[i].rotX * s.frameCount * 0.1: 0
-                )
-              }
-              if(typeof objMain[i].rotSpeedY === 'undefined'){
-                s.rotateY(
-                  typeof objMain[i].rotY !== 'undefined' ? objMain[i].rotY * s.frameCount * 0.1: 0
-                )
-              }
-              if(typeof objMain[i].rotSpeedY !== 'undefined'){
-                s.rotateY(
-                  typeof objMain[i].rotY !== 'undefined' ? objMain[i].rotY * s.frameCount * objMain[i].rotSpeedY: 0
-                )
-              }
-              s.texture(videos[objMain[i].pos])
-              // s.quad(
-              //   typeof objMain[i].posX !== 'undefined' ? objMain[i].posX : 0,
-              //   typeof objMain[i].posY !== 'undefined' ? objMain[i].posY : 0,
-              //   typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
-              //   0,
-              //   typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth,
-              //   typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight,
-              //   0,
-              //   typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight,
-              // )
-              if(objMain[i].shape === 'rect'){
-                s.rect(
-                  typeof objMain[i].posX !== 'undefined' ? objMain[i].posX : 0,
-                  typeof objMain[i].posY !== 'undefined' ? objMain[i].posY : 0,
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc,
-                )
-              }
-              if(objMain[i].shape === 'box'){
-                s.box(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight *sc
-                )
-              }
-              if(objMain[i].shape === 'sphere'){
-                s.sphere(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc
-                )
-              }
-              if(objMain[i].shape === 'cylinder'){
-                s.cylinder(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight *sc
-                )
-              }
-              if(objMain[i].shape === 'cone'){
-                s.cone(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc
-                )
-              }
-              if(objMain[i].shape === 'torus'){
-                s.torus(
-                  typeof objMain[i].width !== 'undefined' ? objMain[i].width : window.innerWidth * sc,
-                  typeof objMain[i].height !== 'undefined' ? objMain[i].height : window.innerHeight * sc
-                )
-              }
-              s.pop()
             }
           }
         }
@@ -234,7 +246,7 @@ const App = () => {
           if(line[1] === 'load'){
             if(line[2] !== 'file0' && line[2] !== 'file1' && line[2] !== 'file2' && line[2] !== 'file3' && line[2] !== 'file4' && line[2] !== 'file5' && line[2] !== 'file6' && line[2] !== 'file7' && line[2] !== 'file8' && line[2] !== 'file9' && line[2] !== 'camera'){
               toReturn[t].url = line[2]
-              toReturn[t].type = checkExt(line[2])
+              toReturn[t].type = line[2]
               toReturn[t].active = true
             }
             if(line[2] === 'file0'){
@@ -331,6 +343,15 @@ const App = () => {
           if(line[1] === 'volume'){
             toReturn[t].volume = line[2]
           }
+          if(line[1] === 'play'){
+            toReturn[t].playStatus = line[2]
+          }
+          if(line[1] === 'stop'){
+            toReturn[t].playStatus = !line[2]
+          }
+          if(line[1] === 'pause'){
+            toReturn[t].seekStatus = line[2]
+          }
         }
         if(line.length === 5){
           if(line[1] === 'color'){
@@ -363,25 +384,25 @@ const App = () => {
       if(e.key === 'Enter'){
         parseP5(code)
       }
-      if(e.shiftKey){
-        if(e.key === 'T'){
+      if(e.altKey){
+        if(e.key === 'h'){
           setHideCode(!hideCode)
         }
       }
     }
   }
 
-  const checkExt = (file) => {
-    let temp = file.split('.')
-    const videoValid = ['mov','webm','mp4']
-    const imgValid = ['jpg','jpeg','png']
-    if(imgValid.includes(temp[temp.length - 1])){
-      return 'image'
-    }
-    if(videoValid.includes(temp[temp.length - 1])){
-      return 'video'
-    }
-  }
+  // const checkExt = (file) => {
+  //   let temp = file.split('.')
+  //   const videoValid = ['mov','webm','mp4']
+  //   const imgValid = ['jpg','jpeg','png']
+  //   if(imgValid.includes(temp[temp.length - 1])){
+  //     return 'image'
+  //   }
+  //   if(videoValid.includes(temp[temp.length - 1])){
+  //     return 'video'
+  //   }
+  // }
 
   const checkCustom = (toCheck) => {
     if(toCheck === zeroCustom){
