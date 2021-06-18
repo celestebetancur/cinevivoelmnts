@@ -98,6 +98,7 @@ const App = () => {
                   videos[objMain[i].pos].autoplay = true
                   videos[objMain[i].pos].play()
                   videos[objMain[i].pos].loop()
+                  videos[objMain[i].pos].volume(typeof objMain[i].volume !== 'undefined' ? objMain[i].volume : 1)
                 }
               })
             }
@@ -117,11 +118,13 @@ const App = () => {
           hydra.s[4].init({src: cnv.canvas})
         }
         s.draw = () => {
-
           s.strokeWeight(0)
           s.background(0,0,0,0)
           for(let i = 0; i < 10; i++){
             if(loadedV[i]){
+              if(objMain[i].type === 'audio'){
+                videos[objMain[i].pos].elt.playbackRate = typeof objMain[i].rate !== 'undefined' ? objMain[i].rate : 1.0
+              }
               if(objMain[i].type !== 'audio'){
                 let sc = typeof objMain[i].scale !== 'undefined' ? objMain[i].scale : 1
                 videos[objMain[i].pos].elt.playbackRate = typeof objMain[i].rate !== 'undefined' ? objMain[i].rate : 1.0
